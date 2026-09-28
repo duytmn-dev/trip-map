@@ -24,9 +24,13 @@ export class TripStore {
     return `${this.firebaseUrl}/trips/${key}.json`;
   }
 
-  async refresh() {
-    if (!this.firebaseUrl) throw new Error("FIREBASE_NOT_CONFIGURED");
-    await this.pendingWrite.catch(() => {});
+  refresh() {
+    if (!this.firebaseUrl) return Promise.reject(new Error("FIREBASE_NOT_CONFIGURED"));
+    this.pendingWrite = this.pendingWrite.catch(() => {}).then(() => this.loadRemoteTrips());
+    return this.pendingWrite;
+  }
+
+  async loadRemoteTrips() {
     const response = await fetch(`${this.firebaseUrl}/trips.json`, { cache: "no-store" });
     if (!response.ok) throw new Error("FIREBASE_READ_FAILED");
     const data = await response.json();
@@ -116,6 +120,26 @@ export class TripStore {
     }
     if (!this.firebaseUrl) return Promise.reject(new Error("FIREBASE_NOT_CONFIGURED"));
     this.pendingWrite = this.pendingWrite.catch(() => {}).then(() => this.writeRemote(snapshot));
+    return this.pendingWrite;
+  }
+
+  remove(id) {
+    if (!this.firebaseUrl) return Promise.reject(new Error("FIREBASE_NOT_CONFIGURED"));
+    this.pendingWrite = this.pendingWrite.catch(() => {}).then(async () => {
+      const previousTrips = this.localList();
+      const remainingTrips = previousTrips.filter((trip) => trip.id !== id);
+      localStorage.setItem(APP_CONFIG.tripsStorageKey, JSON.stringify(remainingTrips));
+      localStorage.removeItem(APP_CONFIG.storageKey);
+
+      try {
+        const response = await fetch(this.firebaseTripUrl(id), { method: "DELETE" });
+        if (!response.ok) throw new Error("FIREBASE_DELETE_FAILED");
+        this.remoteTrips.delete(id);
+      } catch (error) {
+        localStorage.setItem(APP_CONFIG.tripsStorageKey, JSON.stringify(previousTrips));
+        throw error;
+      }
+    });
     return this.pendingWrite;
   }
 

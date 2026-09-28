@@ -57,6 +57,7 @@ const elements = {
 };
 
 const store = new TripStore();
+const deletingTripIds = new Set();
 const placeSearchService = new PlaceSearchService();
 const routingService = new RoutingService();
 let mapController = new MapController("map", handleMapPlaceSelect, showMapError, handleMapClick);
@@ -151,11 +152,14 @@ function renderSavedTrips() {
     const destination = trip.destination?.name || "Chưa chọn điểm đến";
     const dates = [trip.startDate, trip.endDate].filter(Boolean).map(formatPlanDate).join(" – ");
     const details = [destination, dates].filter(Boolean).join(" · ");
-    return `<button class="saved-trip-card" type="button" data-trip-id="${escapeHtml(trip.id)}">
-      <span class="saved-trip-icon"><i data-lucide="map-pinned"></i></span>
-      <span class="saved-trip-content"><strong>${escapeHtml(trip.title || "Chuyến đi chưa đặt tên")}</strong><small>${escapeHtml(details)}</small></span>
-      <span class="saved-trip-open">Mở <i data-lucide="arrow-right"></i></span>
-    </button>`;
+    return `<div class="saved-trip-item">
+      <button class="saved-trip-card" type="button" data-trip-id="${escapeHtml(trip.id)}">
+        <span class="saved-trip-icon"><i data-lucide="map-pinned"></i></span>
+        <span class="saved-trip-content"><strong>${escapeHtml(trip.title || "Chuyến đi chưa đặt tên")}</strong><small>${escapeHtml(details)}</small></span>
+        <span class="saved-trip-open">Mở <i data-lucide="arrow-right"></i></span>
+      </button>
+      <button class="saved-trip-delete" type="button" data-delete-trip-id="${escapeHtml(trip.id)}" aria-label="Xóa chuyến đi ${escapeHtml(trip.title || "chưa đặt tên")}" title="Xóa chuyến đi" ${deletingTripIds.has(trip.id) ? "disabled" : ""}><i data-lucide="trash-2"></i></button>
+    </div>`;
   }).join("") : `<p class="saved-trips-empty">Chưa có chuyến đi đã lưu. Tạo chuyến mới hoặc nhập JSON để bắt đầu.</p>`;
   refreshIcons();
 }
@@ -168,6 +172,25 @@ function showLanding() {
   window.scrollTo({ top: 0, behavior: "smooth" });
   renderSavedTrips();
   refreshTrips();
+}
+
+async function deleteTrip(id) {
+  if (deletingTripIds.has(id)) return;
+  const trip = store.load(id);
+  if (!trip || !window.confirm(`Xóa chuyến đi "${trip.title}" khỏi Firebase và mọi thiết bị?`)) return;
+  deletingTripIds.add(id);
+  renderSavedTrips();
+  try {
+    await store.remove(id);
+    if (state.trip?.id === id) state.trip = null;
+    showToast("Đã xóa chuyến đi");
+  } catch (error) {
+    console.error({ error: error.message, tripId: id }, "Không thể xóa chuyến đi");
+    showToast("Không thể xóa chuyến đi. Vui lòng thử lại.");
+  } finally {
+    deletingTripIds.delete(id);
+    renderSavedTrips();
+  }
 }
 
 async function refreshTrips() {
@@ -987,6 +1010,10 @@ document.addEventListener("click", (event) => {
     const destination = JSON.parse(decodeURIComponent(target.dataset.searchDestination));
     elements.destinationResults.hidden = true;
     openPlanner(createDefaultTrip(destination));
+    return;
+  }
+  if (target.dataset.deleteTripId) {
+    deleteTrip(target.dataset.deleteTripId);
     return;
   }
   if (target.dataset.tripId) {

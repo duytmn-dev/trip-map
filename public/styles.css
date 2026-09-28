@@ -90,8 +90,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 .saved-trips { margin-bottom: 42px; scroll-margin-top: 24px; }
 .saved-trip-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.saved-trip-card { min-width: 0; padding: 18px; display: flex; align-items: center; gap: 14px; text-align: left; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 16px; }
+.saved-trip-item { position: relative; min-width: 0; }
+.saved-trip-card { width: 100%; min-width: 0; padding: 18px 60px 18px 18px; display: flex; align-items: center; gap: 14px; text-align: left; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 16px; }
 .saved-trip-card:hover { border-color: var(--forest-700); background: var(--forest-50); }
+.saved-trip-delete { position: absolute; top: 50%; right: 12px; width: 36px; height: 36px; display: grid; place-items: center; color: #a53d3d; background: transparent; border: 0; border-radius: 9px; transform: translateY(-50%); }
+.saved-trip-delete:hover { background: #fff0f0; }.saved-trip-delete:disabled { opacity: .5; cursor: wait; }.saved-trip-delete svg { width: 17px; }
 .saved-trip-icon { width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center; color: var(--forest-700); background: var(--forest-100); border-radius: 12px; }
 .saved-trip-icon svg { width: 21px; }
 .saved-trip-content { min-width: 0; flex: 1; }
