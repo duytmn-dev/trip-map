@@ -1,5 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { databaseURL: defaultFirebaseDatabaseUrl } = require("../firebase-config.json");
 
 const projectDir = path.resolve(__dirname, "..");
 const publicDir = path.join(projectDir, "public");
@@ -19,6 +20,7 @@ async function buildPages() {
   const config = {
     googleMapsApiKey,
     googleMapsMapId: process.env.GOOGLE_MAPS_MAP_ID?.trim() || "DEMO_MAP_ID",
+    firebaseDatabaseUrl: process.env.FIREBASE_DATABASE_URL?.trim().replace(/\/$/, "") || defaultFirebaseDatabaseUrl,
   };
 
   await fs.rm(outputDir, { recursive: true, force: true });

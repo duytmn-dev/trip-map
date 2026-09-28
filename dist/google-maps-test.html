@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kiểm tra Google Maps API key</title>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; margin: 0; color: #172b25; background: #f5f8f6; }
+      main { max-width: 760px; margin: 40px auto; padding: 0 20px; }
+      h1 { font-size: 1.6rem; }
+      form { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 12px; }
+      input { flex: 1 1 300px; min-width: 0; padding: 11px; border: 1px solid #a8b9b0; border-radius: 6px; font: inherit; }
+      button { padding: 11px 18px; border: 0; border-radius: 6px; color: white; background: #0b6b50; font: inherit; cursor: pointer; }
+      button:disabled { opacity: .6; cursor: default; }
+      #status { min-height: 1.5em; }
+      #map { height: 420px; border: 1px solid #a8b9b0; border-radius: 8px; background: #e4ebe6; }
+      small { display: block; margin-top: 12px; color: #52675c; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Kiểm tra Google Maps JavaScript API</h1>
+      <p>Nhập API key để thử tải bản đồ từ địa chỉ hiện tại. Trang này không lưu key.</p>
+      <form id="key-form">
+        <input id="api-key" type="password" placeholder="Google Maps API key" aria-label="Google Maps API key" autocomplete="off" required />
+        <button id="load-button" type="submit">Thử tải bản đồ</button>
+      </form>
+      <p id="status" role="status" aria-live="polite">Chưa kiểm tra.</p>
+      <div id="map" aria-label="Bản đồ thử nghiệm"></div>
+      <small>Nếu có lỗi, mở Console của trình duyệt để xem mã lỗi Google Maps cụ thể.</small>
+    </main>
+    <script>
+      const form = document.getElementById("key-form");
+      const keyInput = document.getElementById("api-key");
+      const button = document.getElementById("load-button");
+      const status = document.getElementById("status");
+      let timeoutId;
+      let finished = false;
+
+      function finish(message) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeoutId);
+        status.textContent = message;
+      }
+
+      window.gm_authFailure = () => {
+        finish("Google từ chối key. Kiểm tra Console, API restriction, HTTP referrer và billing.");
+      };
+
+      window.initMap = () => {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 10.8231, lng: 106.6297 },
+          zoom: 12,
+        });
+        google.maps.event.addListenerOnce(map, "tilesloaded", () => {
+          finish("Thành công: Google Maps đã tải bản đồ tại địa chỉ này.");
+        });
+      };
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const key = keyInput.value.trim();
+        if (!key) return;
+
+        button.disabled = true;
+        keyInput.value = "";
+        status.textContent = "Đang tải Google Maps...";
+        timeoutId = setTimeout(() => {
+          finish("Quá thời gian chờ. Kiểm tra mạng và Console của trình duyệt.");
+        }, 20000);
+
+        const url = new URL("https://maps.googleapis.com/maps/api/js");
+        url.searchParams.set("key", key);
+        url.searchParams.set("callback", "initMap");
+        url.searchParams.set("loading", "async");
+        const script = document.createElement("script");
+        script.src = url.toString();
+        script.async = true;
+        script.onerror = () => finish("Không tải được Maps JavaScript API. Kiểm tra mạng hoặc Console.");
+        document.head.append(script);
+      });
+    </script>
+  </body>
+</html>

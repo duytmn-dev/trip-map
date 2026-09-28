@@ -1,6 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { databaseURL: defaultFirebaseDatabaseUrl } = require("./firebase-config.json");
 
 const HOST = "127.0.0.1";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
@@ -62,6 +63,7 @@ async function handleRequest(request, response) {
     const config = {
       googleMapsApiKey,
       googleMapsMapId: process.env.GOOGLE_MAPS_MAP_ID?.trim() || "DEMO_MAP_ID",
+      firebaseDatabaseUrl: process.env.FIREBASE_DATABASE_URL?.trim().replace(/\/$/, "") || defaultFirebaseDatabaseUrl,
     };
     response.writeHead(200, {
       "Content-Type": MIME_TYPES[".js"],

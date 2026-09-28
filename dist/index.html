@@ -24,7 +24,7 @@
             <button class="nav-link button-reset" type="button" data-scroll-to="discover">Khám phá</button>
             <button class="nav-link button-reset" type="button" data-scroll-to="saved-trips">Chuyến đi của tôi</button>
           </nav>
-          <button class="header-cta" type="button" data-action="new-trip"><i data-lucide="plus"></i><span>Tạo chuyến đi</span></button>
+          <div class="header-actions"><button class="account-button" type="button" data-action="sign-in" hidden>Đăng nhập Google</button><button class="account-button" type="button" data-action="sign-out" hidden>Đăng xuất</button><button class="header-cta" type="button" data-action="new-trip"><i data-lucide="plus"></i><span>Tạo chuyến đi</span></button></div>
         </header>
 
         <main>
@@ -42,7 +42,7 @@
               <div class="hero-trust">
                 <span><i data-lucide="map"></i> Google Maps</span>
                 <span><i data-lucide="bike"></i> Tuyến xe máy dự kiến</span>
-                <span><i data-lucide="hard-drive"></i> Đồng bộ Firebase</span>
+                <span><i data-lucide="cloud"></i> Đồng bộ theo tài khoản</span>
               </div>
               <button class="secondary-button json-import-button" type="button" data-action="import-json"><i data-lucide="file-up"></i>Nhập chuyến đi từ JSON</button>
             </div>
@@ -58,7 +58,7 @@
           </section>
 
           <section id="saved-trips" class="saved-trips container" aria-labelledby="saved-trips-title">
-            <div class="section-heading compact"><div><span class="section-kicker">DỮ LIỆU FIREBASE</span><h2 id="saved-trips-title">Các chuyến đi</h2></div></div>
+            <div class="section-heading compact"><div><span class="section-kicker">CHUYẾN ĐI CỦA BẠN</span><h2 id="saved-trips-title">Chuyến đi của tôi</h2><p id="sync-message" class="sync-message" role="status">Đang kiểm tra đồng bộ…</p></div></div>
             <div id="saved-trip-list" class="saved-trip-list"></div>
           </section>
 
@@ -89,8 +89,9 @@
       <section id="planner-view" class="planner-view" hidden>
         <header class="planner-header">
           <button class="icon-button" type="button" data-action="go-home" aria-label="Về trang chủ"><i data-lucide="arrow-left"></i></button>
-          <div class="planner-title"><input id="trip-title-header" aria-label="Tên chuyến đi" /><span id="save-status">Đang tải…</span></div>
+          <div class="planner-title"><input id="trip-title-header" aria-label="Tên chuyến đi" /><span id="save-status">Đang kiểm tra đồng bộ…</span></div>
           <div class="planner-actions">
+            <button class="account-button" type="button" data-action="sign-in" hidden>Đăng nhập</button><button class="account-button" type="button" data-action="sign-out" hidden>Đăng xuất</button>
             <button class="secondary-button" type="button" data-action="import-json" title="Nhập JSON"><i data-lucide="file-up"></i><span>Nhập JSON</span></button>
             <button class="secondary-button" type="button" data-action="export-json" title="Tải JSON"><i data-lucide="file-down"></i><span>Tải JSON</span></button>
             <button class="secondary-button" type="button" data-action="share-trip"><i data-lucide="share-2"></i><span>Chia sẻ</span></button>

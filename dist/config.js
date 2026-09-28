@@ -24,6 +24,5 @@ export const APP_CONFIG = Object.freeze({
   },
   storageKey: "roamly.mvp.trip.v1",
   tripsStorageKey: "roamly.mvp.trips.v2",
-  firebaseDatabaseUrl: globalThis.ROAMLY_CONFIG?.firebaseDatabaseUrl?.replace(/\/$/, "") ?? "",
   maxPlacesPerTrip: 24,
 });

@@ -1,6 +1,6 @@
 # Roamly — Trip Map MVP
 
-Ứng dụng web lập kế hoạch chuyến đi, ưu tiên trải nghiệm mobile và có thể triển khai trực tiếp lên GitHub Pages.
+Ứng dụng web lập kế hoạch chuyến đi, ưu tiên trải nghiệm mobile và có thể triển khai trực tiếp lên GitHub Pages. Các chuyến đi được đồng bộ qua Firebase Realtime Database.
 
 ## Tính năng MVP
 
@@ -17,7 +17,7 @@
 - Chạm một địa điểm để ẩn các tuyến còn lại, tập trung đúng tuyến và mở dẫn đường Google Maps.
 - Chạm một điểm bất kỳ trên nền bản đồ để xem địa chỉ, sửa tên hoặc loại điểm, rồi thêm vào ngày đang xem. App ưu tiên tên Google Places, sau đó thử tìm điểm có tên cách vị trí chạm tối đa 35 m trên OpenStreetMap/Photon. Gợi ý OpenStreetMap cần kiểm tra lại trước khi thêm. Mã Plus Code không được dùng làm tên; nếu cả hai nguồn không trả tên, ô tên để trống để nhập thủ công. Điểm đã lưu có nút **Sửa tên** trên thẻ bản đồ.
 - Tải sẵn tuyến đường bộ từ vị trí hiện tại tới từng điểm chưa đi theo các nhóm request nhỏ; có ước lượng dự phòng khi dịch vụ bận.
-- Lưu nhiều chuyến đi bằng `localStorage`; trang chủ hiển thị danh sách để mở lại từng chuyến.
+- Tải danh sách chuyến đi từ Firebase khi mở trang và tự lưu thay đổi lên Firebase; `localStorage` giữ bản dự phòng.
 - Chia sẻ chuyến đi qua URL.
 - Xuất các điểm đã chọn sang trang dẫn đường Google Maps.
 - Responsive cho desktop và mobile.
@@ -29,7 +29,7 @@
 | Hiển thị bản đồ | Google Maps JavaScript API + Advanced Markers | Key lấy từ runtime config; cần Maps JavaScript API và billing |
 | Tìm địa điểm | Google Geocoding, dự phòng Nominatim + Photon / OpenStreetMap | Tìm khi bấm Tìm; ưu tiên ngữ cảnh điểm đến |
 | Tính tuyến | OSRM public demo | Có fallback ước tính khi API bận |
-| Lưu dữ liệu | `localStorage` | Không cần backend |
+| Lưu dữ liệu | Firebase Realtime Database qua REST API | Cần Database URL và Security Rules cho phép đọc/ghi |
 | Mở dẫn đường | Google Maps URL | Không gọi thêm API |
 
 Các public API phù hợp MVP lưu lượng thấp, không có SLA. Khi đưa lên production nên dùng Geoapify, LocationIQ, HERE hoặc tự host Nominatim/OSRM.
@@ -49,6 +49,18 @@ npm start
 
 Mở <http://127.0.0.1:3000>.
 
+## Firebase Realtime Database
+
+1. Dự án đã cấu hình Database URL trong [`firebase-config.json`](./firebase-config.json). Ứng dụng đọc `trips.json` khi mở và ghi từng chuyến dưới `trips/<mã-id>.json`. Có thể đặt biến môi trường `FIREBASE_DATABASE_URL` để dùng một database khác. REST API không cần Web API key khi Security Rules cho phép truy cập không đăng nhập.
+2. Trong tab **Rules** của Realtime Database, cấu hình quyền đọc/ghi cho đường dẫn `trips`. Ví dụ cho ứng dụng dùng chung, nơi mọi người đều có thể xem và chỉnh sửa:
+
+   ```json
+   { "rules": { "trips": { ".read": true, ".write": true } } }
+   ```
+
+   Quy tắc này cho phép bất kỳ ai có Database URL sửa hoặc xóa chuyến đi. Nếu chỉ một số người được sửa, cần thêm Firebase Authentication và quy tắc ghi tương ứng trước khi triển khai công khai.
+3. Mở trang trên máy tính đang có dữ liệu cũ: ứng dụng tự đưa các chuyến trong `localStorage` lên Firebase nếu trên Firebase chưa có hoặc bản cục bộ mới hơn. Sau đó mở trang trên điện thoại để thấy cùng danh sách. Khi không có mạng hoặc Firebase từ chối ghi, trang báo **Chưa đồng bộ Firebase** và giữ bản cục bộ để thử lại lần sau.
+
 Kiểm tra cú pháp:
 
 ```powershell
@@ -67,7 +79,7 @@ Có thể mở `./google-maps-test.html` để kiểm tra riêng key trên cùng
 
 [`da-lat-json.json`](./da-lat-json.json) là file mẫu chuẩn `schema_version: "1.1.0"`. Trên trang chủ hoặc trong chuyến đi, bấm **Nhập JSON** và chọn file. Sau khi sửa trong app, bấm **Tải JSON** để lấy bản mới; app không thể ghi đè trực tiếp file trên máy.
 
-Mỗi chuyến đi được lưu riêng trên thiết bị và xuất hiện trong mục **Chuyến đi của tôi** ở trang chủ. Nhập lại JSON có cùng `trip.id` sẽ cập nhật chuyến đã lưu; để giữ hai phiên bản độc lập, đặt `trip.id` khác nhau. Dữ liệu từ cách lưu một chuyến cũ được chuyển sang danh sách khi lưu chuyến tiếp theo.
+Mỗi chuyến đi được lưu trên Firebase và xuất hiện trong mục **Các chuyến đi** ở trang chủ của mọi thiết bị. Nhập lại JSON có cùng `trip.id` sẽ cập nhật chuyến đã lưu; để giữ hai phiên bản độc lập, đặt `trip.id` khác nhau. Dữ liệu cũ trên thiết bị được tự chuyển lên Firebase khi mở trang.
 
 Các trường chính:
 
@@ -96,7 +108,7 @@ Thư mục `trip-map` hiện nằm trong Git repository `D:\Toys`, chưa có rem
 
 1. Tạo repository GitHub riêng cho ứng dụng và đưa **các file trong `trip-map`** lên thư mục gốc của repository, gồm cả `.github/workflows/deploy-pages.yml`. Không đưa `key.md` hoặc `dist/` lên Git.
 2. Trong Google Cloud Console, tạo hoặc dùng một browser key có application restriction **Websites** cho `https://<ten-tai-khoan>.github.io/*` (và custom domain nếu có). Giới hạn API cho **Maps JavaScript API**, **Geocoding API**, **Places API (New)**; bật billing. Nên dùng key riêng cho trang triển khai. Không giới hạn referrer theo đường dẫn `/<ten-repo>/` vì trình duyệt có thể chỉ gửi origin.
-3. Trong GitHub repository, mở **Settings → Secrets and variables → Actions**. Tạo repository secret `GOOGLE_MAPS_API_KEY` với browser key đã giới hạn. Có thể thêm repository variable `GOOGLE_MAPS_MAP_ID` với map ID của dự án; nếu bỏ trống, app dùng `DEMO_MAP_ID` để chạy thử. Key sẽ xuất hiện trong file JavaScript đã xuất bản vì Google Maps chạy trong trình duyệt; GitHub secret chỉ tránh lưu key trong source Git.
+3. Trong GitHub repository, mở **Settings → Secrets and variables → Actions**. Tạo repository secret `GOOGLE_MAPS_API_KEY` với browser key đã giới hạn. Có thể thêm repository variable `GOOGLE_MAPS_MAP_ID` với map ID của dự án; `FIREBASE_DATABASE_URL` chỉ cần khi muốn ghi đè URL trong `firebase-config.json`. Key Google Maps sẽ xuất hiện trong file JavaScript đã xuất bản vì Google Maps chạy trong trình duyệt; GitHub secret chỉ tránh lưu key trong source Git.
 4. Mở **Settings → Pages → Build and deployment**, chọn **GitHub Actions**. Push lên `main` hoặc chạy workflow thủ công ở tab **Actions**. URL sau khi triển khai thường là `https://<ten-tai-khoan>.github.io/<ten-repo>/`.
 
 Kiểm tra bản tĩnh trước khi đưa lên GitHub (không dùng key thật trong lệnh có thể lưu lịch sử shell):
@@ -107,7 +119,7 @@ node scripts/build-pages.js
 Remove-Item Env:GOOGLE_MAPS_API_KEY
 ```
 
-Thư mục `dist/` chứa site tĩnh để triển khai, được bỏ qua bởi Git. Dữ liệu chuyến đi lưu trong `localStorage` theo từng origin; chuyến lưu ở localhost sẽ không tự xuất hiện trên GitHub Pages. Hãy **Tải JSON** từ bản local và **Nhập JSON** trên trang mới để chuyển chuyến đi.
+Thư mục `dist/` chứa site tĩnh để triển khai, được bỏ qua bởi Git. Bản local và GitHub Pages mặc định dùng chung URL trong `firebase-config.json`; bản cục bộ sẽ tự đưa chuyến đi cũ lên Firebase khi được mở lại.
 
 ## Cấu trúc
 

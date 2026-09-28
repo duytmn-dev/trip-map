@@ -3,6 +3,7 @@ import { CATEGORY_META, DALAT_PLACES, DESTINATIONS } from "./data.js";
 import { addPlaceToDay, findPlanDay, isPlaceInDay, placesForDay, routeForPlaces } from "./day-plan.js";
 import { exportTripPlan, importTripPlan } from "./trip-json.js";
 import { currentOrigin, normalizeVisitedPlaceIds, pendingDestinations, toggleVisitedPlaceId } from "./trip-progress.js";
+import { TripSync } from "./sync.js";
 import {
   MapController,
   isLocationCodeName,
@@ -54,9 +55,11 @@ const elements = {
   toast: document.querySelector("#toast"),
   tripJsonInput: document.querySelector("#trip-json-input"),
   importStatus: document.querySelector("#import-status"),
+  syncMessage: document.querySelector("#sync-message"),
 };
 
 const store = new TripStore();
+const sync = new TripSync(store, handleTripsChange, handleSyncStatus);
 const placeSearchService = new PlaceSearchService();
 const routingService = new RoutingService();
 let mapController = new MapController("map", handleMapPlaceSelect, showMapError, handleMapClick);
@@ -75,6 +78,7 @@ const state = {
   activeDayIndex: null,
   mapPick: null,
   mapPickRequestId: 0,
+  accountId: null,
 };
 
 function refreshIcons() {
@@ -116,20 +120,45 @@ function saveTrip() {
   state.trip.updatedAt = new Date().toISOString();
   const tripId = state.trip.id;
   const updatedAt = state.trip.updatedAt;
-  elements.saveStatus.textContent = "Đang lưu Firebase…";
-  store.save(state.trip).then(() => {
+  elements.saveStatus.textContent = sync.user ? "Đang đồng bộ…" : "Đang lưu…";
+  sync.save(structuredClone(state.trip)).then((mode) => {
     if (state.trip?.id === tripId && state.trip.updatedAt === updatedAt) {
-      elements.saveStatus.textContent = "Đã lưu trên Firebase";
+      elements.saveStatus.textContent = mode === "synced" ? "Đã đồng bộ" : "Đã lưu trên thiết bị";
     }
-    renderSavedTrips();
   }).catch((error) => {
-    console.error({ error: error.message }, "Không thể lưu chuyến đi lên Firebase");
-    if (state.trip?.id === tripId && state.trip.updatedAt === updatedAt) {
-      elements.saveStatus.textContent = "Chưa đồng bộ Firebase";
-    }
-    showToast("Chưa lưu được lên Firebase. Dữ liệu vẫn còn trên thiết bị này.");
+    console.error({ error, tripId }, "Không thể lưu chuyến đi");
+    if (state.trip?.id === tripId) elements.saveStatus.textContent = "Chỉ lưu trên thiết bị";
+    showToast("Chưa đồng bộ được chuyến đi. Thử lại khi có mạng.");
   });
   renderSavedTrips();
+}
+
+function handleTripsChange() {
+  renderSavedTrips();
+  const remote = sync.user && state.trip && sync.load(state.trip.id);
+  if (remote && remote.updatedAt > state.trip.updatedAt && !sync.pendingWrites.has(`${sync.user.uid}/${remote.id}`)) {
+    const currentStep = state.step;
+    openPlanner(remote, { persist: false }).then(() => setStep(currentStep));
+  }
+}
+
+function handleSyncStatus({ mode, user }) {
+  document.querySelectorAll('[data-action="sign-in"]').forEach((button) => { button.hidden = !sync.configured || Boolean(user); });
+  document.querySelectorAll('[data-action="sign-out"]').forEach((button) => { button.hidden = !user; });
+  const messages = {
+    local: "Chỉ lưu trên thiết bị. Cần cấu hình Firebase để đồng bộ.",
+    "signed-out": "Đăng nhập Google để xem cùng chuyến đi trên mọi thiết bị.",
+    syncing: "Đang chuyển và tải chuyến đi của tài khoản…",
+    pending: "Một số thay đổi chưa đồng bộ. Ứng dụng sẽ gửi lại khi có mạng.",
+    synced: `Đã đồng bộ với ${user?.email ?? "tài khoản Google"}.`,
+    error: "Đồng bộ đang lỗi. Chuyến chưa gửi vẫn được giữ trên thiết bị.",
+  };
+  elements.syncMessage.textContent = messages[mode] ?? "";
+  if (state.accountId && state.accountId !== (user?.uid ?? null)) {
+    state.trip = null;
+    showLanding();
+  }
+  state.accountId = user?.uid ?? null;
 }
 
 function renderDestinations() {
@@ -146,7 +175,7 @@ function renderDestinations() {
 }
 
 function renderSavedTrips() {
-  const trips = store.list();
+  const trips = sync.list();
   elements.savedTripList.innerHTML = trips.length ? trips.map((trip) => {
     const destination = trip.destination?.name || "Chưa chọn điểm đến";
     const dates = [trip.startDate, trip.endDate].filter(Boolean).map(formatPlanDate).join(" – ");
@@ -167,20 +196,6 @@ function showLanding() {
   elements.planner.classList.remove("mobile-map");
   window.scrollTo({ top: 0, behavior: "smooth" });
   renderSavedTrips();
-  refreshTrips();
-}
-
-async function refreshTrips() {
-  try {
-    await store.refresh();
-  } catch (error) {
-    console.error({ error: error.message }, "Không thể tải chuyến đi từ Firebase");
-    showToast(error.message === "FIREBASE_NOT_CONFIGURED"
-      ? "Chưa cấu hình Firebase Database URL"
-      : "Không thể tải chuyến đi từ Firebase. Đang hiển thị dữ liệu trên thiết bị.");
-  } finally {
-    renderSavedTrips();
-  }
 }
 
 async function openPlanner(trip, { persist = true } = {}) {
@@ -210,7 +225,7 @@ async function openPlanner(trip, { persist = true } = {}) {
   renderTravelTimes();
   setStep(1);
   if (persist) saveTrip();
-  else elements.saveStatus.textContent = store.isSynced(state.trip.id) ? "Đã lưu trên Firebase" : "Chưa đồng bộ Firebase";
+  else elements.saveStatus.textContent = sync.user ? "Đã đồng bộ" : "Đã lưu trên thiết bị";
   refreshIcons();
   await initializeMap();
   await updateMap();
@@ -259,7 +274,9 @@ function showMapError(error) {
   elements.mapFallback.hidden = false;
   elements.mapFallback.querySelector("p").textContent = error.message === "GOOGLE_MAPS_KEY_MISSING"
     ? "Chưa cấu hình Google Maps API key. Kiểm tra key.md rồi thử lại."
-    : "Google Maps chưa tải được. Kiểm tra key, giới hạn website, billing và kết nối rồi thử lại.";
+    : error.message === "MAPS_APP_CHECK_UNAVAILABLE"
+      ? "App Check chưa xác thực được trang này. Kiểm tra cấu hình Firebase rồi thử lại."
+      : "Google Maps chưa tải được. Kiểm tra key, App Check, billing và kết nối rồi thử lại.";
 }
 
 function setStep(step) {
@@ -727,7 +744,7 @@ async function searchPlaces() {
     renderPlaceResults();
     if (!results.length) {
       const hint = googleError
-        ? "Google Geocoding chưa khả dụng. Kiểm tra Geocoding API và giới hạn key."
+        ? "Google Geocoding chưa khả dụng. Kiểm tra Geocoding API, App Check và key."
         : "Thử nhập tên đầy đủ hoặc số nhà, tên đường và tỉnh/thành phố.";
       elements.placeResults.innerHTML = `<div class="results-message">Không tìm thấy “${escapeHtml(query)}”.<br />${hint}</div>`;
       showToast("Không tìm thấy địa chỉ phù hợp");
@@ -990,7 +1007,7 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (target.dataset.tripId) {
-    const savedTrip = store.load(target.dataset.tripId);
+    const savedTrip = sync.load(target.dataset.tripId);
     if (savedTrip) openPlanner(savedTrip, { persist: false });
     return;
   }
@@ -1033,6 +1050,22 @@ document.addEventListener("click", (event) => {
   if (!action) return;
   const actions = {
     "go-home": showLanding,
+    "sign-in": async () => {
+      try { await sync.signIn(); }
+      catch (error) {
+        if (error.code !== "auth/popup-closed-by-user") {
+          console.error({ error }, "Không thể đăng nhập");
+          showToast("Không thể đăng nhập Google. Kiểm tra cấu hình và thử lại.");
+        }
+      }
+    },
+    "sign-out": async () => {
+      try { await sync.signOut(); }
+      catch (error) {
+        console.error({ error }, "Không thể đăng xuất");
+        showToast("Không thể đăng xuất. Thử lại sau.");
+      }
+    },
     "new-trip": () => openPlanner(createDefaultTrip()),
     "go-step": () => setStep(target.dataset.targetStep),
     "clear-places": () => {
@@ -1067,8 +1100,8 @@ document.addEventListener("click", (event) => {
 async function initializeApp() {
   renderDestinations();
   renderSavedTrips();
-  await refreshTrips();
   refreshIcons();
+  await sync.start();
   const sharedTrip = decodeSharedTrip();
   if (sharedTrip) {
     history.replaceState(null, "", window.location.pathname + window.location.search);

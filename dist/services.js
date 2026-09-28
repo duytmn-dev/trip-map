@@ -10,62 +10,15 @@ export const isLocationCodeName = (value) => typeof value === "string"
 export const preferredPlaceName = (...names) => names.find((name) => typeof name === "string" && name.trim() && !isLocationCodeName(name))?.trim() ?? "";
 
 export class TripStore {
-  constructor() {
-    this.remoteTrips = new Map();
-    this.pendingWrite = Promise.resolve();
+  constructor(storageKey = APP_CONFIG.tripsStorageKey, legacyKey = APP_CONFIG.storageKey) {
+    this.storageKey = storageKey;
+    this.legacyKey = legacyKey;
   }
 
-  get firebaseUrl() {
-    return APP_CONFIG.firebaseDatabaseUrl;
-  }
-
-  firebaseTripUrl(id) {
-    const key = [...new TextEncoder().encode(id)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-    return `${this.firebaseUrl}/trips/${key}.json`;
-  }
-
-  async refresh() {
-    if (!this.firebaseUrl) throw new Error("FIREBASE_NOT_CONFIGURED");
-    await this.pendingWrite.catch(() => {});
-    const response = await fetch(`${this.firebaseUrl}/trips.json`, { cache: "no-store" });
-    if (!response.ok) throw new Error("FIREBASE_READ_FAILED");
-    const data = await response.json();
-    if (data !== null && (typeof data !== "object" || Array.isArray(data))) {
-      throw new Error("INVALID_FIREBASE_TRIPS");
-    }
-    this.remoteTrips = new Map(Object.values(data ?? {})
-      .filter((trip) => trip && typeof trip.id === "string" && trip.id)
-      .map((trip) => [trip.id, trip]));
-
-    let migrationFailed = false;
-    for (const trip of this.localList()) {
-      const remote = this.remoteTrips.get(trip.id);
-      if (!remote || (trip.updatedAt ?? "") > (remote.updatedAt ?? "")) {
-        try {
-          await this.writeRemote(trip);
-        } catch (error) {
-          console.error({ error: error.message, tripId: trip.id }, "Không thể chuyển chuyến đi cũ lên Firebase");
-          migrationFailed = true;
-        }
-      }
-    }
-    if (migrationFailed) throw new Error("FIREBASE_MIGRATION_FAILED");
-  }
-
-  async writeRemote(trip) {
-    const response = await fetch(this.firebaseTripUrl(trip.id), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(trip),
-    });
-    if (!response.ok) throw new Error("FIREBASE_WRITE_FAILED");
-    this.remoteTrips.set(trip.id, trip);
-  }
-
-  localList() {
+  list() {
     let trips = [];
     try {
-      const value = localStorage.getItem(APP_CONFIG.tripsStorageKey);
+      const value = localStorage.getItem(this.storageKey);
       if (value) {
         const saved = JSON.parse(value);
         if (!Array.isArray(saved)) throw new Error("INVALID_TRIPS_STORAGE");
@@ -75,7 +28,7 @@ export class TripStore {
       console.error({ error }, "Không thể đọc danh sách chuyến đi");
     }
     try {
-      const legacyValue = localStorage.getItem(APP_CONFIG.storageKey);
+      const legacyValue = this.legacyKey ? localStorage.getItem(this.legacyKey) : null;
       const legacyTrip = legacyValue ? JSON.parse(legacyValue) : null;
       if (legacyTrip?.id && !trips.some((trip) => trip.id === legacyTrip.id)) trips.push(legacyTrip);
     } catch (error) {
@@ -84,44 +37,33 @@ export class TripStore {
     return trips.sort((first, second) => (second.updatedAt ?? "").localeCompare(first.updatedAt ?? ""));
   }
 
-  list() {
-    const trips = new Map(this.remoteTrips);
-    this.localList().forEach((trip) => {
-      const remote = trips.get(trip.id);
-      if (!remote || (trip.updatedAt ?? "") > (remote.updatedAt ?? "")) trips.set(trip.id, trip);
-    });
-    return [...trips.values()].sort((first, second) => (second.updatedAt ?? "").localeCompare(first.updatedAt ?? ""));
-  }
-
-  isSynced(id) {
-    const remote = this.remoteTrips.get(id);
-    const local = this.localList().find((trip) => trip.id === id);
-    return Boolean(remote && (!local || (local.updatedAt ?? "") <= (remote.updatedAt ?? "")));
-  }
-
   load(id) {
     return this.list().find((trip) => trip.id === id) ?? null;
   }
 
   save(trip) {
-    if (!trip?.id) return Promise.reject(new Error("MISSING_TRIP_ID"));
-    const snapshot = JSON.parse(JSON.stringify(trip));
     try {
-      const trips = this.localList().filter((saved) => saved.id !== trip.id);
-      trips.push(snapshot);
-      localStorage.setItem(APP_CONFIG.tripsStorageKey, JSON.stringify(trips));
-      localStorage.removeItem(APP_CONFIG.storageKey);
+      if (!trip?.id) throw new Error("MISSING_TRIP_ID");
+      const trips = this.list().filter((saved) => saved.id !== trip.id);
+      trips.push(trip);
+      localStorage.setItem(this.storageKey, JSON.stringify(trips));
+      if (this.legacyKey) localStorage.removeItem(this.legacyKey);
+      return true;
     } catch (error) {
       console.error({ error }, "Không thể lưu chuyến đi");
+      return false;
     }
-    if (!this.firebaseUrl) return Promise.reject(new Error("FIREBASE_NOT_CONFIGURED"));
-    this.pendingWrite = this.pendingWrite.catch(() => {}).then(() => this.writeRemote(snapshot));
-    return this.pendingWrite;
+  }
+
+  remove(id) {
+    const trips = this.list().filter((trip) => trip.id !== id);
+    localStorage.setItem(this.storageKey, JSON.stringify(trips));
+    if (this.legacyKey) localStorage.removeItem(this.legacyKey);
   }
 
   clear() {
-    localStorage.removeItem(APP_CONFIG.tripsStorageKey);
-    localStorage.removeItem(APP_CONFIG.storageKey);
+    localStorage.removeItem(this.storageKey);
+    if (this.legacyKey) localStorage.removeItem(this.legacyKey);
   }
 }
 
@@ -562,6 +504,18 @@ export class RoutingService {
 }
 
 let googleMapsLoader = null;
+let mapsAppCheckTokenProvider = null;
+
+export async function setMapsAppCheckTokenProvider(provider) {
+  mapsAppCheckTokenProvider = provider;
+  if (window.google?.maps) await configureMapsAppCheck();
+}
+
+async function configureMapsAppCheck() {
+  if (!mapsAppCheckTokenProvider) return;
+  const { Settings } = await window.google.maps.importLibrary("core");
+  Settings.getInstance().fetchAppCheckToken = mapsAppCheckTokenProvider;
+}
 
 const MARKER_ICONS = Object.freeze({
   hotel: '<path d="M3 20V5m0 12h18v3m0-8v8M3 12h18M6 12V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5" />',
@@ -575,7 +529,10 @@ function markerIcon(category) {
 }
 
 function loadGoogleMaps() {
-  if (window.google?.maps?.marker) return Promise.resolve();
+  if (globalThis.ROAMLY_CONFIG?.mapsAppCheckRequired && !mapsAppCheckTokenProvider) {
+    return Promise.reject(new Error("MAPS_APP_CHECK_UNAVAILABLE"));
+  }
+  if (window.google?.maps?.marker) return configureMapsAppCheck();
   if (!APP_CONFIG.map.apiKey) return Promise.reject(new Error("GOOGLE_MAPS_KEY_MISSING"));
   if (googleMapsLoader) return googleMapsLoader;
 
@@ -587,6 +544,7 @@ function loadGoogleMaps() {
     url.searchParams.set("libraries", "marker");
     url.searchParams.set("callback", callbackName);
     url.searchParams.set("loading", "async");
+    url.searchParams.set("v", "weekly");
 
     const timeout = setTimeout(() => reject(new Error("GOOGLE_MAPS_TIMEOUT")), 20000);
     window[callbackName] = () => {
@@ -603,7 +561,7 @@ function loadGoogleMaps() {
     script.src = url.toString();
     script.async = true;
     document.head.append(script);
-  }).catch((error) => {
+  }).then(configureMapsAppCheck).catch((error) => {
     googleMapsLoader = null;
     throw error;
   });
