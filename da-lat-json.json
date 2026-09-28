@@ -1,0 +1,374 @@
+{
+  "schema_version": "1.1.0",
+  "trip": {
+    "id": "dalat_2026_12_24_27",
+    "name": "Đà Lạt 24-27/12/2026",
+    "transport": "motorbike",
+    "start_city": "TP.HCM",
+    "destination": "Đà Lạt",
+    "return_city": "TP.HCM",
+    "start_date": "2026-12-24",
+    "end_date": "2026-12-27"
+  },
+  "hub": {
+    "id": "hotel_savio_trieu_viet_vuong",
+    "type": "hotel",
+    "name": "Savio Hotel Trieu Viet Vuong",
+    "address": "2 Đường Triệu Việt Vương, Đà Lạt, Lâm Đồng, Việt Nam",
+    "map_query": "Savio Hotel Trieu Viet Vuong, 2 Triệu Việt Vương, Đà Lạt",
+    "use_as_route_center": true,
+    "place_id": "ChIJ73br-xFtcTERA0OpjBf8IH8"
+  },
+  "days": [
+    {
+      "date": "2026-12-25",
+      "theme": "Gần Savio Hotel + trung tâm Đà Lạt, tuyến ngắn và ít vòng",
+      "main_places": [
+        "bao_dai_palace_3",
+        "crazy_house",
+        "chicken_church",
+        "lam_vien_square",
+        "xuan_huong_lake"
+      ],
+      "optional_places": [
+        "city_flower_garden"
+      ],
+      "recommended_clusters": [
+        "near_hotel_south",
+        "near_hotel_center",
+        "city_center",
+        "city_center_north"
+      ]
+    },
+    {
+      "date": "2026-12-26",
+      "theme": "Săn mây Cầu Đất + Trại Mát + tuyến phía Đông, tối về trung tâm",
+      "main_places": [
+        "cau_dat_cloud_hunting_area",
+        "cau_dat_tea_area",
+        "linh_phuoc_pagoda",
+        "dalat_railway_station",
+        "dalat_night_market"
+      ],
+      "optional_places": [
+        "euro_garden_cau_dat"
+      ],
+      "recommended_clusters": [
+        "east_cau_dat",
+        "east_trai_mat",
+        "east_inner_city",
+        "city_center"
+      ]
+    },
+    {
+      "date": "2026-12-27",
+      "theme": "Về TP.HCM, chỉ chọn các điểm cùng hướng phía Nam / trên đường về",
+      "main_places": [],
+      "optional_places": [
+        "truc_lam_monastery",
+        "tuyen_lam_lake",
+        "datanla_waterfall",
+        "pongour_waterfall"
+      ],
+      "recommended_clusters": [
+        "south",
+        "south_exit",
+        "return_route_detour"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "id": "bao_dai_palace_3",
+      "name": "Dinh III Bảo Đại",
+      "category": "history_architecture",
+      "cluster": "near_hotel_south",
+      "address": "1 Triệu Việt Vương, Đà Lạt",
+      "map_query": "Dinh III Bảo Đại, 1 Triệu Việt Vương, Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "high",
+      "map_category": "sight",
+      "coordinates": [
+        108.4298,
+        11.9296
+      ]
+    },
+    {
+      "id": "crazy_house",
+      "name": "Crazy House - Biệt thự Hằng Nga",
+      "category": "architecture",
+      "cluster": "near_hotel_center",
+      "address": "03 Huỳnh Thúc Kháng, Đà Lạt",
+      "map_query": "Crazy House Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "high",
+      "map_category": "sight",
+      "place_id": "ChIJpTjuGjMTcTERhjx317psdj8"
+    },
+    {
+      "id": "chicken_church",
+      "name": "Nhà thờ Con Gà",
+      "category": "architecture_religion",
+      "cluster": "city_center",
+      "address": "17 Trần Phú, Đà Lạt",
+      "map_query": "Nhà thờ Con Gà Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJO2W6kDETcTERSsw0agDhJzg"
+    },
+    {
+      "id": "xuan_huong_lake",
+      "name": "Hồ Xuân Hương",
+      "category": "scenic_lake",
+      "cluster": "city_center",
+      "address": "Trần Quốc Toản, Đà Lạt",
+      "map_query": "Hồ Xuân Hương, Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "coordinates": [
+        108.4485,
+        11.9415
+      ]
+    },
+    {
+      "id": "lam_vien_square",
+      "name": "Quảng trường Lâm Viên",
+      "category": "city_landmark",
+      "cluster": "city_center",
+      "address": "Trần Quốc Toản, Đà Lạt",
+      "map_query": "Quảng trường Lâm Viên, Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "high",
+      "map_category": "sight",
+      "coordinates": [
+        108.4501,
+        11.9368
+      ]
+    },
+    {
+      "id": "dalat_railway_station",
+      "name": "Ga Đà Lạt",
+      "category": "architecture_transport_history",
+      "cluster": "east_inner_city",
+      "address": "01 Quang Trung, Đà Lạt",
+      "map_query": "Ga Đà Lạt, 01 Quang Trung, Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJg63CWVQScTER-2-TYuyq4PY"
+    },
+    {
+      "id": "city_flower_garden",
+      "name": "Vườn hoa thành phố Đà Lạt",
+      "category": "garden",
+      "cluster": "city_center_north",
+      "address": "Trần Quốc Toản, Đà Lạt",
+      "map_query": "Vườn hoa thành phố Đà Lạt",
+      "priority_days": [
+        "2026-12-25"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJZ0qug8wTcTER0m4S0SZkp2I"
+    },
+    {
+      "id": "truc_lam_monastery",
+      "name": "Thiền viện Trúc Lâm",
+      "category": "religion_scenic",
+      "cluster": "south",
+      "address": "Trúc Lâm Yên Tử, Đà Lạt",
+      "map_query": "Thiền viện Trúc Lâm Đà Lạt",
+      "priority_days": [
+        "2026-12-27"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJkXq2pDgVcTERV-WGDk9NtRQ"
+    },
+    {
+      "id": "tuyen_lam_lake",
+      "name": "Hồ Tuyền Lâm",
+      "category": "scenic_lake",
+      "cluster": "south",
+      "address": "Phường 4, Đà Lạt",
+      "map_query": "Hồ Tuyền Lâm, Đà Lạt",
+      "priority_days": [
+        "2026-12-27"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJm1asQ0xrcTER3KoyuLidX4E"
+    },
+    {
+      "id": "datanla_waterfall",
+      "name": "Thác Datanla",
+      "category": "waterfall_adventure",
+      "cluster": "south_exit",
+      "address": "Đèo Prenn, Đà Lạt",
+      "map_query": "Thác Datanla, Đèo Prenn, Đà Lạt",
+      "priority_days": [
+        "2026-12-27"
+      ],
+      "priority": "medium",
+      "map_category": "sight",
+      "place_id": "ChIJQTO5pKEUcTERZcAVKbeOzvg"
+    },
+    {
+      "id": "linh_phuoc_pagoda",
+      "name": "Chùa Linh Phước",
+      "category": "religion_architecture",
+      "cluster": "east_trai_mat",
+      "address": "120 Tự Phước, Đà Lạt",
+      "map_query": "Chùa Linh Phước, 120 Tự Phước, Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "high",
+      "map_category": "sight",
+      "place_id": "ChIJ24TIxRsTcTERG9_-OgIyiSA"
+    },
+    {
+      "id": "cau_dat_cloud_hunting_area",
+      "name": "Khu vực săn mây Cầu Đất",
+      "category": "sunrise_cloud_hunting",
+      "cluster": "east_cau_dat",
+      "address": "Xuân Trường - Cầu Đất, Đà Lạt",
+      "map_query": "Cầu Đất, Xuân Trường, Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "must_do",
+      "weather_dependency": "very_high",
+      "map_category": "sight",
+      "place_id": "ChIJAVdAv0oXcTERL6v91zKsVkA"
+    },
+    {
+      "id": "cau_dat_tea_area",
+      "name": "Đồi chè / Cầu Đất Farm",
+      "category": "tea_farm_scenic",
+      "cluster": "east_cau_dat",
+      "address": "Cầu Đất, Xuân Trường, Đà Lạt",
+      "map_query": "Cầu Đất Farm, Xuân Trường, Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "high",
+      "map_category": "sight",
+      "coordinates": [
+        108.5857,
+        11.8828
+      ]
+    },
+    {
+      "id": "euro_garden_cau_dat",
+      "name": "Euro Garden - Vườn Châu Âu Cầu Đất",
+      "category": "garden_photo",
+      "cluster": "east_cau_dat",
+      "address": "Cầu Đất Farm, Xuân Trường, Đà Lạt",
+      "map_query": "Euro Garden Cầu Đất, Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "optional",
+      "map_category": "sight",
+      "place_id": "ChIJyTfYLD4XcTER9AmV8KOxlDc"
+    },
+    {
+      "id": "langbiang",
+      "name": "Khu du lịch Langbiang",
+      "category": "mountain_scenic",
+      "cluster": "north",
+      "address": "Lạc Dương, Lâm Đồng",
+      "map_query": "Khu du lịch Langbiang, Lạc Dương, Lâm Đồng",
+      "priority_days": [],
+      "priority": "optional",
+      "map_category": "sight",
+      "place_id": "ChIJVVVVVaV0cTERz91NGuxuAQQ"
+    },
+    {
+      "id": "dalat_night_market",
+      "name": "Chợ đêm Đà Lạt",
+      "category": "night_market_food",
+      "cluster": "city_center",
+      "address": "Phường 1, Đà Lạt",
+      "map_query": "Chợ đêm Đà Lạt",
+      "priority_days": [
+        "2026-12-26"
+      ],
+      "priority": "high",
+      "map_category": "food",
+      "coordinates": [
+        108.4371,
+        11.9421
+      ]
+    },
+    {
+      "id": "festival_flower_space",
+      "name": "Không gian hoa Festival Hoa Đà Lạt 2026",
+      "category": "festival_event",
+      "cluster": "city_center",
+      "address": "Khu vực Hồ Xuân Hương - Trần Quốc Toản - Yersin - Bích Câu, Đà Lạt",
+      "map_query": "Hồ Xuân Hương, Đà Lạt",
+      "priority_days": [],
+      "priority": "optional",
+      "map_category": "sight",
+      "place_id": "ChIJL9Ajjd8ScTERNAPClxAZWEY"
+    },
+    {
+      "id": "pongour_waterfall",
+      "name": "Thác Pongour",
+      "category": "waterfall",
+      "cluster": "return_route_detour",
+      "address": "Ninh Gia, Đức Trọng, Lâm Đồng",
+      "map_query": "Thác Pongour",
+      "priority_days": [
+        "2026-12-27"
+      ],
+      "priority": "low_for_this_trip",
+      "map_category": "sight",
+      "place_id": "ChIJVWpX3hlFcTERL70HydbZ8DU"
+    }
+  ],
+  "planner_rules": {
+    "hub_id": "hotel_savio_trieu_viet_vuong",
+    "use_hotel_as_route_center": true,
+    "group_places_by_cluster": true,
+    "avoid_cross_city_zigzag": true,
+    "prefer_main_places_before_optional_places": true,
+    "day_27_only_choose_places_on_or_near_return_route": true,
+    "cloud_hunting_depends_on_weather": true
+  },
+  "selected_place_ids": [
+    "bao_dai_palace_3",
+    "crazy_house",
+    "chicken_church",
+    "lam_vien_square",
+    "xuan_huong_lake",
+    "city_flower_garden",
+    "cau_dat_cloud_hunting_area",
+    "cau_dat_tea_area",
+    "linh_phuoc_pagoda",
+    "dalat_railway_station",
+    "dalat_night_market",
+    "euro_garden_cau_dat",
+    "truc_lam_monastery",
+    "tuyen_lam_lake",
+    "datanla_waterfall",
+    "pongour_waterfall"
+  ],
+  "visited_place_ids": []
+}

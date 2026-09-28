@@ -1,0 +1,14 @@
+{
+  "name": "trip-map",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MVP lập kế hoạch chuyến đi với Google Maps, OpenStreetMap và OSRM",
+  "scripts": {
+    "start": "node server.js",
+    "build:pages": "node scripts/build-pages.js",
+    "check": "node --check server.js && node --check public/config.js && node --check public/data.js && node --check public/services.js && node --check public/trip-json.js && node --check public/day-plan.js && node --check public/trip-progress.js && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

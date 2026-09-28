@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b6b50" />
+    <meta name="description" content="Lên kế hoạch chuyến đi, chọn địa điểm và xem lộ trình trên bản đồ mở." />
+    <title>Roamly — Lập chuyến đi dễ dàng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <input id="trip-json-input" type="file" accept=".json,application/json" hidden />
+      <div id="import-status" class="import-status" role="status" aria-live="polite"></div>
+      <section id="landing-view" class="landing-view">
+        <header class="site-header container">
+          <button class="brand button-reset" type="button" data-action="go-home" aria-label="Roamly trang chủ">
+            <span class="brand-symbol"><i data-lucide="route"></i></span><span>roamly</span>
+          </button>
+          <nav aria-label="Điều hướng chính">
+            <button class="nav-link button-reset" type="button" data-scroll-to="discover">Khám phá</button>
+            <button class="nav-link button-reset" type="button" data-scroll-to="saved-trips">Chuyến đi của tôi</button>
+          </nav>
+          <button class="header-cta" type="button" data-action="new-trip"><i data-lucide="plus"></i><span>Tạo chuyến đi</span></button>
+        </header>
+
+        <main>
+          <section class="hero container">
+            <div class="hero-copy">
+              <span class="hero-kicker"><i data-lucide="sparkles"></i> LÊN ĐƯỜNG THEO CÁCH CỦA BẠN</span>
+              <h1>Mỗi chuyến đi,<br /><em>một câu chuyện.</em></h1>
+              <p>Chọn khách sạn, lưu nơi yêu thích và xem ngay thời gian xe máy đến từng địa điểm trên bản đồ.</p>
+              <form id="destination-form" class="destination-search" autocomplete="off">
+                <i data-lucide="search"></i>
+                <input id="destination-input" type="search" placeholder="Bạn muốn đi đâu?" aria-label="Tìm điểm đến" />
+                <button type="submit">Khám phá</button>
+                <div id="destination-results" class="search-results" hidden></div>
+              </form>
+              <div class="hero-trust">
+                <span><i data-lucide="map"></i> Google Maps</span>
+                <span><i data-lucide="bike"></i> Tuyến xe máy dự kiến</span>
+                <span><i data-lucide="hard-drive"></i> Lưu trên thiết bị</span>
+              </div>
+              <button class="secondary-button json-import-button" type="button" data-action="import-json"><i data-lucide="file-up"></i>Nhập chuyến đi từ JSON</button>
+            </div>
+            <div class="hero-visual" aria-label="Bản xem trước chuyến đi Đà Lạt">
+              <div class="hero-photo"></div>
+              <div class="floating-card weather-card"><span>Đà Lạt</span><strong>19°</strong><small>Mây nhẹ · rất hợp để đi</small></div>
+              <div class="floating-card route-card"><span class="route-icon"><i data-lucide="navigation"></i></span><div><small>Từ khách sạn</small><strong>4 điểm · 8–24 phút</strong></div></div>
+              <div class="map-doodle" aria-hidden="true">
+                <span class="doodle-pin pin-a">1</span><span class="doodle-pin pin-b">2</span><span class="doodle-pin pin-c">3</span>
+                <svg viewBox="0 0 250 160"><path d="M30 115 C55 50, 92 130, 125 82 S185 30, 222 58" /></svg>
+              </div>
+            </div>
+          </section>
+
+          <section id="saved-trips" class="saved-trips container" aria-labelledby="saved-trips-title">
+            <div class="section-heading compact"><div><span class="section-kicker">LƯU TRÊN THIẾT BỊ</span><h2 id="saved-trips-title">Chuyến đi của tôi</h2></div></div>
+            <div id="saved-trip-list" class="saved-trip-list"></div>
+          </section>
+
+          <section id="discover" class="discover-section container">
+            <div class="section-heading">
+              <div><span class="section-kicker">GỢI Ý CHO BẠN</span><h2>Đi đâu tiếp theo?</h2></div>
+              <p>Những điểm đến vừa đủ xa để đổi gió, vừa đủ gần để bắt đầu ngay cuối tuần này.</p>
+            </div>
+            <div id="destination-grid" class="destination-grid"></div>
+          </section>
+
+          <section class="steps-section container">
+            <div class="section-heading compact"><div><span class="section-kicker">NHẸ NHÀNG TỪ Ý TƯỞNG ĐẾN LỊCH TRÌNH</span><h2>Ba bước là lên đường</h2></div></div>
+            <div class="steps-grid">
+              <article><span>01</span><i data-lucide="calendar-range"></i><h3>Tạo chuyến đi</h3><p>Chọn nơi đến, ngày đi và phong cách bạn muốn.</p></article>
+              <article><span>02</span><i data-lucide="map-pin-plus"></i><h3>Gom địa điểm</h3><p>Thêm khách sạn, điểm chơi và quán ngon vào một nơi.</p></article>
+              <article><span>03</span><i data-lucide="map"></i><h3>Xem trên bản đồ</h3><p>So sánh thời gian xe máy từ khách sạn đến từng nơi.</p></article>
+            </div>
+          </section>
+        </main>
+
+        <footer class="site-footer container">
+          <div class="brand"><span class="brand-symbol"><i data-lucide="route"></i></span><span>roamly</span></div>
+          <p>Bản đồ Google Maps, dữ liệu địa điểm OpenStreetMap, tuyến đường OSRM.</p><span>Made for wandering souls.</span>
+        </footer>
+      </section>
+
+      <section id="planner-view" class="planner-view" hidden>
+        <header class="planner-header">
+          <button class="icon-button" type="button" data-action="go-home" aria-label="Về trang chủ"><i data-lucide="arrow-left"></i></button>
+          <div class="planner-title"><input id="trip-title-header" aria-label="Tên chuyến đi" /><span id="save-status">Đã lưu trên thiết bị</span></div>
+          <div class="planner-actions">
+            <button class="secondary-button" type="button" data-action="import-json" title="Nhập JSON"><i data-lucide="file-up"></i><span>Nhập JSON</span></button>
+            <button class="secondary-button" type="button" data-action="export-json" title="Tải JSON"><i data-lucide="file-down"></i><span>Tải JSON</span></button>
+            <button class="secondary-button" type="button" data-action="share-trip"><i data-lucide="share-2"></i><span>Chia sẻ</span></button>
+            <button class="primary-button" type="button" data-action="open-maps"><i data-lucide="navigation"></i><span>Mở Google Maps</span></button>
+          </div>
+        </header>
+
+        <div class="planner-shell">
+          <aside id="planner-sidebar" class="planner-sidebar">
+            <div class="progress-tabs" role="tablist" aria-label="Các bước lập chuyến đi">
+              <button class="progress-tab active" type="button" data-step="1"><span>1</span>Thông tin</button>
+              <button class="progress-tab" type="button" data-step="2"><span>2</span>Địa điểm</button>
+              <button class="progress-tab" type="button" data-step="3"><span>3</span>Bản đồ</button>
+            </div>
+
+            <section class="planner-step active" data-step-panel="1">
+              <div class="panel-heading"><span class="section-kicker">BƯỚC 1</span><h2>Chuyến đi của bạn</h2><p>Điền vài thông tin cơ bản. Bạn có thể thay đổi bất kỳ lúc nào.</p></div>
+              <form id="trip-details-form" class="details-form">
+                <label>Tên chuyến đi<input id="trip-name" name="title" required maxlength="60" /></label>
+                <div class="field-row">
+                  <label>Ngày bắt đầu (nếu có)<input id="start-date" name="startDate" type="date" /></label>
+                  <label>Ngày kết thúc (nếu có)<input id="end-date" name="endDate" type="date" /></label>
+                </div>
+                <label>Điểm đến<div class="readonly-field"><i data-lucide="map-pin"></i><span id="trip-destination-name"></span></div></label>
+                <fieldset><legend>Phong cách chuyến đi</legend><div class="vibe-grid">
+                  <label><input type="radio" name="vibe" value="nature" /><span><i data-lucide="trees"></i>Thiên nhiên</span></label>
+                  <label><input type="radio" name="vibe" value="food" /><span><i data-lucide="utensils"></i>Ẩm thực</span></label>
+                  <label><input type="radio" name="vibe" value="culture" /><span><i data-lucide="landmark"></i>Văn hóa</span></label>
+                  <label><input type="radio" name="vibe" value="slow" /><span><i data-lucide="coffee"></i>Chill</span></label>
+                </div></fieldset>
+                <label>Ghi chú<textarea id="trip-notes" name="notes" rows="3" placeholder="Ví dụ: cà phê, thiên nhiên, check-in..."></textarea></label>
+                <button class="primary-button wide" type="submit">Tiếp tục chọn địa điểm <i data-lucide="arrow-right"></i></button>
+              </form>
+            </section>
+
+            <section class="planner-step" data-step-panel="2">
+              <div class="panel-heading"><span class="section-kicker">BƯỚC 2</span><h2>Thêm địa điểm</h2><p>Chọn một khách sạn làm điểm xuất phát, sau đó thêm các nơi muốn đến.</p></div>
+              <div id="category-tabs" class="category-tabs">
+                <button class="active" type="button" data-category="all"><i data-lucide="layout-grid"></i>Tất cả</button>
+                <button type="button" data-category="hotel"><i data-lucide="bed-double"></i>Khách sạn</button>
+                <button type="button" data-category="sight"><i data-lucide="camera"></i>Tham quan</button>
+                <button type="button" data-category="food"><i data-lucide="utensils"></i>Ăn uống</button>
+              </div>
+              <form id="place-search-form" class="place-search"><i data-lucide="search"></i><input id="place-search-input" type="search" placeholder="Tìm tên địa điểm hoặc địa chỉ" /><button type="submit">Tìm</button></form>
+              <div class="selected-summary"><span><strong id="selected-count">0</strong> điểm đã chọn</span><button type="button" data-action="clear-places">Bỏ chọn tất cả</button></div>
+              <div id="place-results" class="place-results"></div>
+              <button class="primary-button wide sticky-next" type="button" data-action="go-step" data-target-step="3">Xem trên bản đồ <i data-lucide="arrow-right"></i></button>
+            </section>
+
+            <section class="planner-step itinerary-step" data-step-panel="3">
+              <div class="panel-heading"><span class="section-kicker">THỜI GIAN DỰ KIẾN</span><h2>Từ vị trí hiện tại</h2><p>Bắt đầu ở khách sạn. Tick điểm đã đi để tính các tuyến tiếp theo từ điểm đó.</p></div>
+              <div id="day-tabs" class="day-tabs" role="group" aria-label="Xem lịch trình theo ngày" hidden></div>
+              <p id="day-theme" class="day-theme" hidden></p>
+              <div id="route-summary" class="route-summary"><span><i data-lucide="bed-double"></i><strong>Chưa chọn khách sạn</strong></span><small>Chọn khách sạn làm điểm xuất phát</small></div>
+              <ol id="itinerary-list" class="itinerary-list"></ol>
+              <div class="itinerary-actions">
+                <button class="secondary-button wide" type="button" data-action="go-step" data-target-step="2"><i data-lucide="plus"></i>Thêm địa điểm</button>
+                <button class="primary-button wide" type="button" data-action="open-maps"><i data-lucide="navigation"></i>Mở Google Maps</button>
+              </div>
+            </section>
+          </aside>
+
+          <section id="map-panel" class="map-panel" aria-label="Bản đồ chuyến đi">
+            <div id="map" class="map"></div>
+            <div id="map-day-tabs" class="day-tabs map-day-tabs" role="group" aria-label="Lọc bản đồ theo ngày" hidden></div>
+            <div id="map-loading" class="map-loading"><span class="loader"></span><strong>Đang mở bản đồ…</strong></div>
+            <div id="map-fallback" class="map-fallback" hidden><i data-lucide="map-off"></i><strong>Chưa tải được bản đồ</strong><p>Danh sách thời gian vẫn dùng được. Hãy kiểm tra kết nối và thử tải lại.</p><button type="button" data-action="retry-map">Thử lại</button></div>
+            <div class="map-provider-badge"><span class="online-dot"></span> Google Maps</div>
+            <div class="map-zoom-controls" role="group" aria-label="Điều khiển phóng to bản đồ">
+              <button type="button" data-action="map-zoom-in" aria-label="Phóng to bản đồ" title="Phóng to"><i data-lucide="plus"></i></button>
+              <button type="button" data-action="map-zoom-out" aria-label="Thu nhỏ bản đồ" title="Thu nhỏ"><i data-lucide="minus"></i></button>
+            </div>
+            <div id="map-pick-card" class="map-pick-card" hidden>
+              <strong>Thêm điểm từ bản đồ</strong>
+              <p id="map-pick-status">Đang tìm địa điểm…</p>
+              <form id="map-pick-form" hidden>
+                <label>Tên địa điểm<input id="map-pick-name" name="name" placeholder="Nhập tên địa điểm" required maxlength="100" /></label>
+                <label>Loại điểm<select id="map-pick-category" name="category">
+                  <option value="sight">Tham quan</option><option value="food">Ăn uống</option><option value="other">Khác</option><option value="hotel">Khách sạn</option>
+                </select></label>
+                <button class="primary-button" type="submit">Thêm vào lịch trình</button>
+              </form>
+              <button class="map-pick-cancel" type="button" data-action="cancel-map-pick">Hủy</button>
+            </div>
+            <div id="map-overview-card" class="map-overview-card">
+              <span class="overview-card-icon"><i data-lucide="bike"></i></span>
+              <div><small>THỜI GIAN TỪ VỊ TRÍ HIỆN TẠI</small><strong id="map-overview-title">Chưa chọn điểm xuất phát</strong><p id="map-overview-detail">Chọn khách sạn làm điểm xuất phát</p><button id="map-navigation-button" type="button" data-action="navigate-selected" hidden><i data-lucide="navigation"></i>Mở chỉ đường</button><button id="map-visited-button" type="button" data-action="toggle-visited-selected" hidden>✓ Đánh dấu đã đi</button><button id="map-rename-button" type="button" data-action="rename-selected" hidden>Sửa tên</button></div>
+            </div>
+          </section>
+        </div>
+
+        <nav class="mobile-planner-nav" aria-label="Chế độ xem">
+          <button class="active" type="button" data-mobile-view="plan"><i data-lucide="list-checks"></i><span>Lập kế hoạch</span></button>
+          <button type="button" data-mobile-view="map"><i data-lucide="map"></i><span>Bản đồ</span></button>
+          <button type="button" data-action="go-step" data-target-step="3"><i data-lucide="bike"></i><span>Thời gian</span></button>
+        </nav>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script src="./runtime-config.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

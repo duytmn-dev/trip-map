@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+npm-debug.log*
+
+# API key cục bộ, không đưa lên Git.
+key.md
+dist/

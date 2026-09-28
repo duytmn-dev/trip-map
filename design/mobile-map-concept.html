@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Đề xuất bản đồ điện thoại · Trip Map</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #eaf0eb; color: #17332b; font-family: "Segoe UI", Arial, sans-serif; }
+    .board { width: 940px; min-height: 950px; margin: 0 auto; padding: 25px 28px 30px; }
+    .eyebrow { color: #397d68; font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+    h1 { margin: 5px 0 18px; font-size: 27px; letter-spacing: -.035em; }
+    .screens { display: flex; gap: 30px; }
+    .case { width: 427px; }
+    .case-title { height: 35px; display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; }
+    .case-title b { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 7px; color: white; background: #08684f; font-size: 12px; }
+    .phone { position: relative; width: 390px; height: 812px; overflow: hidden; background: #eef3ec; border: 7px solid #203c33; border-radius: 31px; box-shadow: 0 18px 42px #16392d35; }
+    .phone-inner { position: absolute; inset: 0; overflow: hidden; border-radius: 23px; }
+    .map { position: absolute; inset: 66px 0 65px; overflow: hidden; background: #edf1e8; }
+    .map-art { width: 100%; height: 100%; display: block; }
+    .header { position: absolute; z-index: 5; top: 0; left: 0; right: 0; height: 66px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; background: #fff; box-shadow: 0 2px 12px #123a2817; }
+    .icon-btn { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; color: #1c3f34; background: #f5f8f5; border: 1px solid #e2eae3; border-radius: 13px; font-size: 23px; }
+    .header-title { min-width: 0; flex: 1; }
+    .header-title strong { display: block; font-size: 15px; line-height: 1.1; }
+    .header-title small { display: block; margin-top: 4px; color: #688076; font-size: 11px; }
+    .more { width: 38px; height: 42px; display: grid; place-items: center; color: #1c3f34; font-size: 24px; font-weight: bold; }
+    .day-strip { position: absolute; z-index: 4; top: 78px; left: 11px; right: 11px; height: 47px; padding: 5px; display: flex; gap: 4px; background: #fffefbf2; border: 1px solid #dde8de; border-radius: 15px; box-shadow: 0 5px 20px #214c3829; }
+    .day { flex: 1; display: grid; place-items: center; color: #426257; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .day.active { color: white; background: #08684f; }
+    .map-label { position: absolute; color: #6a8178; font-weight: 600; font-size: 12px; text-shadow: 0 1px white; }
+    .map-label.a { top: 100px; left: 136px; }.map-label.b { top: 250px; left: 12px; }.map-label.c { top: 382px; right: 11px; }.map-label.d { bottom: 87px; left: 28px; }
+    .pin { position: absolute; z-index: 2; width: 39px; height: 39px; display: grid; place-items: center; color: white; background: #8755d5; border: 3px solid white; border-radius: 50%; box-shadow: 0 4px 13px #264b3c55; font-size: 15px; font-weight: 800; }
+    .pin.food { background: #ee8951; }.pin.hotel { width: 47px; height: 47px; color: white; background: #08684f; border: 4px solid white; border-radius: 14px; font-size: 18px; }
+    .pin.selected { outline: 4px solid #e6be68; }
+    .place-name { position: absolute; z-index: 2; padding: 5px 7px; color: #244438; background: #fff; border: 1px solid #d6e4d9; border-radius: 7px; box-shadow: 0 3px 9px #264b3c21; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .place-name em { margin-left: 4px; color: #087151; font-size: 9px; font-style: normal; font-weight: 800; }
+    .place-name.hotel-name { color: #075a45; border-color: #bcdcc9; }
+    .overview { position: absolute; z-index: 5; left: 12px; right: 12px; bottom: 76px; height: 178px; padding: 10px 15px 12px; background: white; border: 1px solid #e1e9e1; border-radius: 19px; box-shadow: 0 10px 30px #204b3638; }
+    .handle { width: 33px; height: 4px; margin: 0 auto 10px; border-radius: 10px; background: #cedbd1; }
+    .list-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .list-heading strong { font-size: 12px; }.list-heading span { color: #087151; font-size: 10px; font-weight: 800; }
+    .list-subtitle { display: block; color: #71847a; font-size: 10px; }
+    .place-row { height: 31px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eff2ee; }
+    .place-row:last-child { border-bottom: 0; }
+    .row-num { width: 21px; height: 21px; display: grid; place-items: center; color: white; background: #8755d5; border-radius: 50%; font-size: 10px; font-weight: 800; }.row-num.food { background: #ee8951; }
+    .place-row strong { flex: 1; font-size: 10px; }.place-row small { color: #087151; font-size: 10px; font-weight: 800; }
+    .subaction { margin: 7px 0 0 51px; color: #08684f; font-size: 11px; font-weight: 800; }
+    .detail { height: 141px; }
+    .detail .handle { margin-bottom: 8px; }.detail-heading { display: flex; align-items: center; gap: 10px; }.detail-heading .number { width: 31px; height: 31px; display: grid; place-items: center; color: white; background: #8755d5; border-radius: 50%; font-size: 13px; font-weight: 800; }
+    .detail-heading strong { font-size: 13px; }.detail-heading small { display: block; margin-top: 3px; color: #647b71; font-size: 10px; }
+    .travel-time { margin: 10px 0 0 1px; display: flex; justify-content: space-between; align-items: center; }.travel-time span { color: #286c56; font-size: 12px; font-weight: 800; }.travel-time small { color: #82948a; font-size: 10px; }
+    .directions { position: absolute; right: 13px; bottom: 13px; padding: 10px 13px; color: white; background: #08684f; border-radius: 10px; font-size: 11px; font-weight: 800; }
+    .detail .subaction { margin: 12px 0 0 1px; font-size: 10px; }
+    .nav { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: 65px; display: grid; grid-template-columns: repeat(3, 1fr); background: white; border-top: 1px solid #e1e8e0; }
+    .nav-item { display: grid; place-content: center; gap: 2px; color: #8c9c93; text-align: center; font-size: 10px; font-weight: 700; }.nav-item .glyph { font-size: 21px; line-height: 1; }.nav-item.active { color: #08684f; }
+    .hint { margin-top: 9px; max-width: 390px; color: #547265; font-size: 13px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div class="eyebrow">TRIP MAP · PHÁC THẢO GIAO DIỆN</div>
+    <h1>Bản đồ gọn hơn trên điện thoại</h1>
+    <div class="screens">
+      <section class="case">
+        <div class="case-title"><b>1</b> Xem tổng quan</div>
+        <div class="phone"><div class="phone-inner">
+          <div class="map" data-map="overview"></div>
+          <header class="header"><span class="icon-btn">‹</span><div class="header-title"><strong>Đà Lạt</strong><small>24–27/12/2026 · 10 địa điểm</small></div><span class="more">⋮</span></header>
+          <div class="day-strip"><span class="day active">Tất cả</span><span class="day">25/12</span><span class="day">26/12</span><span class="day">27/12</span></div>
+          <div class="overview"><div class="handle"></div><div class="list-heading"><strong>Từ Savio Hotel Triệu Việt Vương</strong><span>Xem tất cả ›</span></div><small class="list-subtitle">10 địa điểm · gần nhất từ khách sạn</small><div class="place-row"><span class="row-num">1</span><strong>Nhà thờ Con Gà</strong><small>2 phút</small></div><div class="place-row"><span class="row-num food">2</span><strong>Mì Quảng Bà Xí</strong><small>4 phút</small></div><div class="place-row"><span class="row-num">4</span><strong>Quảng trường Lâm Viên</strong><small>5 phút</small></div></div>
+          <nav class="nav"><div class="nav-item"><span class="glyph">≡</span>Lập kế hoạch</div><div class="nav-item active"><span class="glyph">▣</span>Bản đồ</div><div class="nav-item"><span class="glyph">◷</span>Thời gian</div></nav>
+        </div></div>
+        <div class="hint">Tên ngắn đi cùng marker; ba điểm gần nhất có thời gian trong danh sách dưới bản đồ.</div>
+      </section>
+      <section class="case">
+        <div class="case-title"><b>2</b> Chọn một địa điểm</div>
+        <div class="phone"><div class="phone-inner">
+          <div class="map" data-map="selected"></div>
+          <header class="header"><span class="icon-btn">‹</span><div class="header-title"><strong>Đà Lạt</strong><small>24–27/12/2026 · 10 địa điểm</small></div><span class="more">⋮</span></header>
+          <div class="day-strip"><span class="day active">Tất cả</span><span class="day">25/12</span><span class="day">26/12</span><span class="day">27/12</span></div>
+          <div class="overview detail"><div class="handle"></div><div class="detail-heading"><span class="number">3</span><div><strong>Thiền viện Trúc Lâm</strong><small>Tham quan · Ngày 2</small></div></div><div class="travel-time"><span>8 phút đi xe máy</span><small>Từ Savio Hotel</small></div><div class="subaction">Xem trong lịch trình →</div><span class="directions">↗ Chỉ đường</span></div>
+          <nav class="nav"><div class="nav-item"><span class="glyph">≡</span>Lập kế hoạch</div><div class="nav-item active"><span class="glyph">▣</span>Bản đồ</div><div class="nav-item"><span class="glyph">◷</span>Thời gian</div></nav>
+        </div></div>
+        <div class="hint">Chỉ tuyến đến điểm đã chọn nổi bật; thẻ dưới có thời gian và chỉ đường.</div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const mapSvg = `<svg class="map-art" viewBox="0 0 376 681" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="376" height="681" fill="#edf1e8"/>
+      <path d="M0 0H125L77 78L96 155L0 203Z M244 0H376V180L307 167L271 111Z M0 428L99 455L110 681H0Z M244 427L376 378V681H201Z" fill="#d9eedd"/>
+      <path d="M-20 473C36 431 66 449 85 489C103 522 139 516 166 547C189 576 174 616 229 637L259 681H-20Z" fill="#b9ddea"/>
+      <g stroke="#fff" stroke-width="15" fill="none" stroke-linecap="round"><path d="M-12 118C55 93 92 92 149 137S267 223 400 202"/><path d="M-12 320C91 301 115 260 187 283S309 369 405 340"/><path d="M35 -10C45 75 64 123 47 214S69 386 122 445S183 583 142 700"/><path d="M277 -10C250 112 204 187 233 272S242 435 302 515L372 691"/><path d="M-20 591C63 562 104 550 187 556S294 533 393 569"/></g>
+      <g stroke="#d6ded4" stroke-width="2" fill="none" stroke-linecap="round"><path d="M-12 118C55 93 92 92 149 137S267 223 400 202"/><path d="M-12 320C91 301 115 260 187 283S309 369 405 340"/><path d="M35 -10C45 75 64 123 47 214S69 386 122 445S183 583 142 700"/><path d="M277 -10C250 112 204 187 233 272S242 435 302 515L372 691"/><path d="M-20 591C63 562 104 550 187 556S294 533 393 569"/></g>
+      <g stroke="#fff" stroke-width="8" fill="none" stroke-linecap="round"><path d="M75 2L146 71L141 130L108 177L169 247L157 341"/><path d="M129 435L216 419L255 382L357 398"/><path d="M302 57L347 83L375 116"/><path d="M199 277L152 309L94 300"/><path d="M148 557L100 610L84 677"/><path d="M242 282L320 253L375 277"/></g>
+      <path d="M13 398C50 371 65 337 75 303S109 255 132 263C168 276 190 326 193 373S168 448 165 487" fill="none" stroke="#a8c9b3" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 7"/>
+      <text x="180" y="214" fill="#879b8d" font-size="12" font-weight="700">TRUNG TÂM ĐÀ LẠT</text>
+      <text x="256" y="486" fill="#7eaa8b" font-size="12" font-weight="700">RỪNG THÔNG</text>
+    </svg>`;
+    const pinMarkup = `<span class="map-label a">Hồ Xuân Hương</span><span class="map-label b">Khu Du Lịch Cáp Treo</span><span class="map-label c">Đèo Mimosa</span><span class="map-label d">Hồ Tuyền Lâm</span>
+      <span class="pin hotel" style="left:38px;top:235px">⌂</span><span class="place-name hotel-name" style="left:77px;top:250px">Savio Hotel</span>
+      <span class="pin" style="left:230px;top:124px">1</span><span class="place-name" style="left:207px;top:164px">Nhà thờ Con Gà <em>2p</em></span>
+      <span class="pin food" style="left:124px;top:174px">2</span><span class="place-name" style="left:93px;top:214px">Mì Quảng Bà Xí <em>4p</em></span>
+      <span class="pin spot" style="left:168px;top:385px">3</span><span class="place-name" style="left:131px;top:425px">Thiền viện Trúc Lâm</span>
+      <span class="pin" style="left:284px;top:198px">4</span><span class="place-name" style="left:251px;top:238px">Quảng trường <em>5p</em></span>
+      <span class="pin" style="left:293px;top:348px">5</span><span class="place-name" style="left:267px;top:388px">Thác Datanla</span>
+      <span class="pin food" style="left:60px;top:365px">6</span><span class="place-name" style="left:40px;top:405px">Dinh III</span>`;
+    document.querySelectorAll("[data-map]").forEach((map) => {
+      map.innerHTML = mapSvg + pinMarkup;
+      if (map.dataset.map === "selected") {
+        map.querySelector(".spot").classList.add("selected");
+        map.insertAdjacentHTML("beforeend", `<svg style="position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none" viewBox="0 0 376 681" preserveAspectRatio="none"><path d="M62 257C51 314 91 338 129 373S153 392 187 405" fill="none" stroke="#08684f" stroke-width="5" stroke-linecap="round"/></svg>`);
+      }
+    });
+  </script>
+</body>
+</html>

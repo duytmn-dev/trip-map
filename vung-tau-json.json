@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.1.0",
+  "trip": {
+    "id": "vung_tau_2d1n",
+    "name": "Vũng Tàu 2 ngày 1 đêm",
+    "transport": "motorbike",
+    "start_city": "TP.HCM",
+    "destination": "Vũng Tàu",
+    "return_city": "TP.HCM",
+    "start_date": null,
+    "end_date": null
+  },
+  "hub": {
+    "id": "hotel_vung_tau_tbd",
+    "type": "hotel",
+    "name": "Khách sạn Vũng Tàu - chưa chọn",
+    "address": "",
+    "map_query": "Bãi Sau, Vũng Tàu",
+    "use_as_route_center": true
+  },
+  "days": [
+    {
+      "date": null,
+      "theme": "Vũng Tàu nội thành - cung biển, cảnh đẹp, ít chạy vòng",
+      "main_places": [
+        "bai_sau",
+        "mui_nghinh_phong",
+        "tuong_chua_kito",
+        "bach_dinh",
+        "bai_truoc"
+      ],
+      "optional_places": [
+        "hai_dang_vung_tau"
+      ],
+      "recommended_clusters": [
+        "south_coast",
+        "small_mountain",
+        "city_center",
+        "front_beach"
+      ]
+    },
+    {
+      "date": null,
+      "theme": "Rời Vũng Tàu - Long Hải - Phước Hải - An Nhứt - Hồ Suối Rao - về TP.HCM",
+      "main_places": [
+        "long_hai_beach",
+        "deo_nuoc_ngot",
+        "phuoc_hai_fishing_village",
+        "an_nhut_field",
+        "ho_suoi_rao"
+      ],
+      "optional_places": [
+        "dinh_co_long_hai"
+      ],
+      "recommended_clusters": [
+        "long_hai",
+        "phuoc_hai",
+        "an_nhut",
+        "suoi_rao"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "id": "bai_sau",
+      "name": "Bãi Sau Vũng Tàu",
+      "category": "beach",
+      "cluster": "south_coast",
+      "address": "Đường Thùy Vân, Vũng Tàu",
+      "map_query": "Bãi Sau Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "mui_nghinh_phong",
+      "name": "Mũi Nghinh Phong",
+      "category": "coastal_viewpoint",
+      "cluster": "south_coast",
+      "address": "Vũng Tàu",
+      "map_query": "Mũi Nghinh Phong Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "tuong_chua_kito",
+      "name": "Tượng Chúa Kitô Vua",
+      "category": "religion_viewpoint",
+      "cluster": "small_mountain",
+      "address": "Núi Nhỏ, Vũng Tàu",
+      "map_query": "Tượng Chúa Kitô Vua Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "bach_dinh",
+      "name": "Bạch Dinh",
+      "category": "history_architecture",
+      "cluster": "front_beach",
+      "address": "Vũng Tàu",
+      "map_query": "Bạch Dinh Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "medium",
+      "map_category": "sight"
+    },
+    {
+      "id": "bai_truoc",
+      "name": "Bãi Trước",
+      "category": "beach_city_view",
+      "cluster": "front_beach",
+      "address": "Vũng Tàu",
+      "map_query": "Bãi Trước Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "medium",
+      "map_category": "sight"
+    },
+    {
+      "id": "hai_dang_vung_tau",
+      "name": "Hải đăng Vũng Tàu",
+      "category": "viewpoint",
+      "cluster": "small_mountain",
+      "address": "Núi Nhỏ, Vũng Tàu",
+      "map_query": "Hải đăng Vũng Tàu",
+      "priority_days": [
+        1
+      ],
+      "priority": "optional",
+      "map_category": "sight"
+    },
+    {
+      "id": "long_hai_beach",
+      "name": "Biển Long Hải",
+      "category": "beach",
+      "cluster": "long_hai",
+      "address": "Long Hải, Bà Rịa - Vũng Tàu",
+      "map_query": "Biển Long Hải",
+      "priority_days": [
+        2
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "dinh_co_long_hai",
+      "name": "Dinh Cô Long Hải",
+      "category": "religion_culture",
+      "cluster": "long_hai",
+      "address": "Long Hải, Bà Rịa - Vũng Tàu",
+      "map_query": "Dinh Cô Long Hải",
+      "priority_days": [
+        2
+      ],
+      "priority": "optional",
+      "map_category": "sight"
+    },
+    {
+      "id": "deo_nuoc_ngot",
+      "name": "Đèo Nước Ngọt",
+      "category": "scenic_road",
+      "cluster": "phuoc_hai",
+      "address": "Long Hải - Phước Hải, Bà Rịa - Vũng Tàu",
+      "map_query": "Đèo Nước Ngọt Long Hải",
+      "priority_days": [
+        2
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "phuoc_hai_fishing_village",
+      "name": "Làng chài Phước Hải",
+      "category": "fishing_village",
+      "cluster": "phuoc_hai",
+      "address": "Phước Hải, Bà Rịa - Vũng Tàu",
+      "map_query": "Làng chài Phước Hải",
+      "priority_days": [
+        2
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "an_nhut_field",
+      "name": "Cánh đồng An Nhứt",
+      "category": "rural_scenic",
+      "cluster": "an_nhut",
+      "address": "An Nhứt, Long Điền, Bà Rịa - Vũng Tàu",
+      "map_query": "Cánh đồng An Nhứt Bà Rịa Vũng Tàu",
+      "priority_days": [
+        2
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    },
+    {
+      "id": "ho_suoi_rao",
+      "name": "Hồ Suối Rao",
+      "category": "lake_nature",
+      "cluster": "suoi_rao",
+      "address": "Suối Rao, Bà Rịa - Vũng Tàu",
+      "map_query": "Hồ Suối Rao Bà Rịa Vũng Tàu",
+      "priority_days": [
+        2
+      ],
+      "priority": "high",
+      "map_category": "sight"
+    }
+  ],
+  "planner_rules": {
+    "hub_id": "hotel_vung_tau_tbd",
+    "use_hotel_as_route_center": true,
+    "group_places_by_cluster": true,
+    "avoid_cross_city_zigzag": true,
+    "prefer_main_places_before_optional_places": true,
+    "day_27_only_choose_places_on_or_near_return_route": false,
+    "cloud_hunting_depends_on_weather": false
+  },
+  "selected_place_ids": [
+    "bai_sau",
+    "mui_nghinh_phong",
+    "tuong_chua_kito",
+    "bach_dinh",
+    "bai_truoc",
+    "hai_dang_vung_tau",
+    "long_hai_beach",
+    "dinh_co_long_hai",
+    "deo_nuoc_ngot",
+    "phuoc_hai_fishing_village",
+    "an_nhut_field",
+    "ho_suoi_rao"
+  ]
+}
